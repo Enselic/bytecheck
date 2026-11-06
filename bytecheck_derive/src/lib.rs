@@ -193,13 +193,9 @@ fn derive_check_bytes(mut input: DeriveInput) -> Result<TokenStream, Error> {
                             (),
                             <__C as #crate_path::rancor::Fallible>::Error,
                         > {
-                            // SAFETY: The caller guarantees that `value` is
-                            // aligned and points to enough readable memory.
-                            unsafe {
-                                #(#field_checks)*
-                                #verify
-                                ::core::result::Result::Ok(())
-                            }
+                            #(#field_checks)*
+                            #verify
+                            ::core::result::Result::Ok(())
                         }
                     }
                 }
@@ -251,13 +247,9 @@ fn derive_check_bytes(mut input: DeriveInput) -> Result<TokenStream, Error> {
                             (),
                             <__C as #crate_path::rancor::Fallible>::Error,
                         > {
-                            // SAFETY: The caller guarantees that `value` is
-                            // aligned and points to enough readable memory.
-                            unsafe {
-                                #(#field_checks)*
-                                #verify
-                                ::core::result::Result::Ok(())
-                            }
+                            #(#field_checks)*
+                            #verify
+                            ::core::result::Result::Ok(())
                         }
                     }
                 }
