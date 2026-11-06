@@ -26,7 +26,7 @@ enum Choice {
 #[derive(CheckBytes)]
 #[repr(u8)]
 enum ChoiceOneVariant {
-    Boo(usize),
+    Boo(usize   ),
 }
 
 fn main() {

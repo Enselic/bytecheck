@@ -461,13 +461,11 @@ fn derive_check_bytes(mut input: DeriveInput) -> Result<TokenStream, Error> {
                             (),
                             <__C as #crate_path::rancor::Fallible>::Error,
                         > {
-                            // SAFETY: The combination of
-                            // * the caller guarantee that `value` is aligned
-                            //   and initialized
-                            // * Rust guarantees of layout of enums with a
-                            //   primitive repr
-                            // means that we can safely cast `value` to the type
-                            // of the repr.
+                            // SAFETY: The caller guarantees that `value` is
+                            // aligned and points to initialized bytes. Rust's
+                            // layout guarantees for enums with a primitive
+                            // `repr` puts the tag at the same memory location
+                            // as `value`.
                             let tag = unsafe { *value.cast::<#primitive>() };
                             match tag {
                                 #(#tag_variant_values => #check_arms)*
