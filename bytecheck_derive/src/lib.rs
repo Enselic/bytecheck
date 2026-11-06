@@ -270,12 +270,8 @@ fn derive_check_bytes(mut input: DeriveInput) -> Result<TokenStream, Error> {
                             (),
                             <__C as #crate_path::rancor::Fallible>::Error,
                         > {
-                            // SAFETY: The caller guarantees that `value` is
-                            // aligned and points to enough readable memory.
-                            unsafe {
-                                #verify
-                                ::core::result::Result::Ok(())
-                            }
+                            #verify
+                            ::core::result::Result::Ok(())
                         }
                     }
                 }
@@ -462,17 +458,14 @@ fn derive_check_bytes(mut input: DeriveInput) -> Result<TokenStream, Error> {
                             (),
                             <__C as #crate_path::rancor::Fallible>::Error,
                         > {
-                            // SAFETY: The caller guarantees that `value` is
-                            // aligned and points to enough readable memory.
-                            unsafe {
-                                let tag = *value.cast::<#primitive>();
-                                match tag {
-                                    #(#tag_variant_values => #check_arms)*
-                                    _ => #no_matching_tag_arm,
-                                }
-                                #verify
-                                ::core::result::Result::Ok(())
+                            // SAFETY: `value` is a valid pointer to `Self`, which has a `#[repr(#primitive)]` discriminant.
+                            let tag = unsafe { *value.cast::<#primitive>() };
+                            match tag {
+                                #(#tag_variant_values => #check_arms)*
+                                _ => #no_matching_tag_arm,
                             }
+                            #verify
+                            ::core::result::Result::Ok(())
                         }
                     }
                 };
@@ -531,7 +524,9 @@ fn check_arm_unnamed_field(
     let index = Index::from(i + 1);
     quote! {
         <#ty as #crate_path::CheckBytes<__C>>::check_bytes(
-            ::core::ptr::addr_of!((*value).#index),
+            unsafe {
+                ::core::ptr::addr_of!((*value).#index)
+            },
             context
         ).map_err(|e| {
             <
