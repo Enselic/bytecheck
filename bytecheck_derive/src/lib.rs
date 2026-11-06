@@ -156,7 +156,10 @@ fn derive_check_bytes(mut input: DeriveInput) -> Result<TokenStream, Error> {
                     let ty = &f.ty;
                     quote! {
                         <#ty as #crate_path::CheckBytes<__C>>::check_bytes(
-                            ::core::ptr::addr_of!((*value).#field),
+                            // SAFETY: NORDHOLTS
+                            unsafe {
+                                ::core::ptr::addr_of!((*value).#field)
+                            },
                             context
                         ).map_err(|e| {
                             <
@@ -210,7 +213,9 @@ fn derive_check_bytes(mut input: DeriveInput) -> Result<TokenStream, Error> {
                             <
                                 #ty as #crate_path::CheckBytes<__C>
                             >::check_bytes(
-                                ::core::ptr::addr_of!((*value).#index),
+                                unsafe {
+                                    ::core::ptr::addr_of!((*value).#index)
+                                },
                                 context
                             ).map_err(|e| {
                                 <
@@ -502,7 +507,9 @@ fn check_arm_named_field(
     let ty = &f.ty;
     quote! {
         <#ty as #crate_path::CheckBytes<__C>>::check_bytes(
-            ::core::ptr::addr_of!((*value).#field_name),
+            unsafe {
+                ::core::ptr::addr_of!((*value).#field_name)
+            },
             context
         ).map_err(|e| {
             <

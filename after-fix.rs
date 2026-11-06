@@ -1,17 +1,16 @@
 #![feature(prelude_import)]
 #![allow(dead_code)]
 extern crate std;
+use bytecheck::CheckBytes;
 #[prelude_import]
 use std::prelude::rust_2021::*;
-use bytecheck::CheckBytes;
 #[repr(C)]
 struct Named {
     field: bool,
 }
 #[automatically_derived]
-unsafe impl<
-    __C: ::bytecheck::rancor::Fallible + ?::core::marker::Sized,
-> ::bytecheck::CheckBytes<__C> for Named
+unsafe impl<__C: ::bytecheck::rancor::Fallible + ?::core::marker::Sized>
+    ::bytecheck::CheckBytes<__C> for Named
 where
     <__C as ::bytecheck::rancor::Fallible>::Error: ::bytecheck::rancor::Trace,
     bool: ::bytecheck::CheckBytes<__C>,
@@ -19,7 +18,8 @@ where
     unsafe fn check_bytes(
         value: *const Self,
         context: &mut __C,
-    ) -> ::core::result::Result<(), <__C as ::bytecheck::rancor::Fallible>::Error> {
+    ) -> ::core::result::Result<(), <__C as ::bytecheck::rancor::Fallible>::Error>
+    {
         unsafe {
             <bool as ::bytecheck::CheckBytes<
                 __C,
@@ -40,9 +40,8 @@ where
 #[repr(C)]
 struct Tuple(bool);
 #[automatically_derived]
-unsafe impl<
-    __C: ::bytecheck::rancor::Fallible + ?::core::marker::Sized,
-> ::bytecheck::CheckBytes<__C> for Tuple
+unsafe impl<__C: ::bytecheck::rancor::Fallible + ?::core::marker::Sized>
+    ::bytecheck::CheckBytes<__C> for Tuple
 where
     <__C as ::bytecheck::rancor::Fallible>::Error: ::bytecheck::rancor::Trace,
     bool: ::bytecheck::CheckBytes<__C>,
@@ -50,7 +49,8 @@ where
     unsafe fn check_bytes(
         value: *const Self,
         context: &mut __C,
-    ) -> ::core::result::Result<(), <__C as ::bytecheck::rancor::Fallible>::Error> {
+    ) -> ::core::result::Result<(), <__C as ::bytecheck::rancor::Fallible>::Error>
+    {
         unsafe {
             <bool as ::bytecheck::CheckBytes<
                 __C,
@@ -70,16 +70,16 @@ where
 }
 struct Unit;
 #[automatically_derived]
-unsafe impl<
-    __C: ::bytecheck::rancor::Fallible + ?::core::marker::Sized,
-> ::bytecheck::CheckBytes<__C> for Unit
+unsafe impl<__C: ::bytecheck::rancor::Fallible + ?::core::marker::Sized>
+    ::bytecheck::CheckBytes<__C> for Unit
 where
     <__C as ::bytecheck::rancor::Fallible>::Error: ::bytecheck::rancor::Trace,
 {
     unsafe fn check_bytes(
         value: *const Self,
         context: &mut __C,
-    ) -> ::core::result::Result<(), <__C as ::bytecheck::rancor::Fallible>::Error> {
+    ) -> ::core::result::Result<(), <__C as ::bytecheck::rancor::Fallible>::Error>
+    {
         unsafe { ::core::result::Result::Ok(()) }
     }
 }
@@ -115,18 +115,21 @@ const _: () = {
         __phantom: ::core::marker::PhantomData<Choice>,
     }
     #[automatically_derived]
-    unsafe impl<
-        __C: ::bytecheck::rancor::Fallible + ?::core::marker::Sized,
-    > ::bytecheck::CheckBytes<__C> for Choice
+    unsafe impl<__C: ::bytecheck::rancor::Fallible + ?::core::marker::Sized>
+        ::bytecheck::CheckBytes<__C> for Choice
     where
-        <__C as ::bytecheck::rancor::Fallible>::Error: ::bytecheck::rancor::Source,
+        <__C as ::bytecheck::rancor::Fallible>::Error:
+            ::bytecheck::rancor::Source,
         bool: ::bytecheck::CheckBytes<__C>,
         bool: ::bytecheck::CheckBytes<__C>,
     {
         unsafe fn check_bytes(
             value: *const Self,
             context: &mut __C,
-        ) -> ::core::result::Result<(), <__C as ::bytecheck::rancor::Fallible>::Error> {
+        ) -> ::core::result::Result<
+            (),
+            <__C as ::bytecheck::rancor::Fallible>::Error,
+        > {
             unsafe {
                 let tag = *value.cast::<u8>();
                 match tag {
