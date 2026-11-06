@@ -157,7 +157,7 @@ use simdutf8::basic::from_utf8;
 /// ```
 ///
 /// See [`Verify`] for an example which uses less unsafe.
-pub unsafe trait CheckBytes<C: Fallible + ?Sized> {
+ pub unsafe trait CheckBytes<C: Fallible + ?Sized> {
     /// Checks whether the given pointer points to a valid value within the
     /// given context.
     ///

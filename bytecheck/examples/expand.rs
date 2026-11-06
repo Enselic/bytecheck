@@ -23,6 +23,12 @@ enum Choice {
     Named { field: bool },
 }
 
+#[derive(CheckBytes)]
+#[repr(u8)]
+enum ChoiceOneVariant {
+    Boo(usize),
+}
+
 fn main() {
     unsafe {
         check_bytes::<Named, Failure>(&Named { field: true }).unwrap();

@@ -155,13 +155,14 @@ fn derive_check_bytes(mut input: DeriveInput) -> Result<TokenStream, Error> {
                     let field = &f.ident;
                     let ty = &f.ty;
                     quote! {
-                        <#ty as #crate_path::CheckBytes<__C>>::check_bytes(
-                            // SAFETY: NORDHOLTS
-                            unsafe {
-                                ::core::ptr::addr_of!((*value).#field)
-                            },
-                            context
-                        ).map_err(|e| {
+                        // SAFETY: `value` is valid for reads, so the field
+                        // pointer is too.
+                        unsafe {
+                            <#ty as #crate_path::CheckBytes<__C>>::check_bytes(
+                                ::core::ptr::addr_of!((*value).#field),
+                                context
+                            )
+                        }.map_err(|e| {
                             <
                                 <
                                     __C as #crate_path::rancor::Fallible
@@ -206,14 +207,16 @@ fn derive_check_bytes(mut input: DeriveInput) -> Result<TokenStream, Error> {
                         let ty = &f.ty;
                         let index = Index::from(i);
                         quote! {
-                            <
-                                #ty as #crate_path::CheckBytes<__C>
-                            >::check_bytes(
-                                unsafe {
-                                    ::core::ptr::addr_of!((*value).#index)
-                                },
-                                context
-                            ).map_err(|e| {
+                            // SAFETY: `value` is valid for reads, so the field
+                            // pointer is too.
+                            unsafe {
+                                <
+                                    #ty as #crate_path::CheckBytes<__C>
+                                >::check_bytes(
+                                    ::core::ptr::addr_of!((*value).#index),
+                                    context
+                                )
+                            }.map_err(|e| {
                                 <
                                     <
                                         __C as #crate_path::rancor::Fallible
@@ -458,7 +461,13 @@ fn derive_check_bytes(mut input: DeriveInput) -> Result<TokenStream, Error> {
                             (),
                             <__C as #crate_path::rancor::Fallible>::Error,
                         > {
-                            // SAFETY: `value` is a valid pointer to `Self`, which has a `#[repr(#primitive)]` discriminant.
+                            // SAFETY: The combination of
+                            // * the caller guarantee that `value` is aligned
+                            //   and initialized
+                            // * Rust guarantees of layout of enums with a
+                            //   primitive repr
+                            // means that we can safely cast `value` to the type
+                            // of the repr.
                             let tag = unsafe { *value.cast::<#primitive>() };
                             match tag {
                                 #(#tag_variant_values => #check_arms)*
@@ -491,12 +500,13 @@ fn check_arm_named_field(
     let field_name = &f.ident;
     let ty = &f.ty;
     quote! {
-        <#ty as #crate_path::CheckBytes<__C>>::check_bytes(
-            unsafe {
-                ::core::ptr::addr_of!((*value).#field_name)
-            },
-            context
-        ).map_err(|e| {
+        // SAFETY: `value` is valid for reads, so the field pointer is too.
+        unsafe {
+            <#ty as #crate_path::CheckBytes<__C>>::check_bytes(
+                ::core::ptr::addr_of!((*value).#field_name),
+                context
+            )
+        }.map_err(|e| {
             <
                 <
                     __C as #crate_path::rancor::Fallible
@@ -523,12 +533,13 @@ fn check_arm_unnamed_field(
     let ty = &f.ty;
     let index = Index::from(i + 1);
     quote! {
-        <#ty as #crate_path::CheckBytes<__C>>::check_bytes(
-            unsafe {
-                ::core::ptr::addr_of!((*value).#index)
-            },
-            context
-        ).map_err(|e| {
+        // SAFETY: `value` is valid for reads, so the field pointer is too.
+        unsafe {
+            <#ty as #crate_path::CheckBytes<__C>>::check_bytes(
+                ::core::ptr::addr_of!((*value).#index),
+                context
+            )
+        }.map_err(|e| {
             <
                 <
                     __C as #crate_path::rancor::Fallible

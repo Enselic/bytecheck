@@ -20,9 +20,11 @@ where
         value: *const Self,
         context: &mut __C,
     ) -> ::core::result::Result<(), <__C as ::bytecheck::rancor::Fallible>::Error> {
-        <bool as ::bytecheck::CheckBytes<
-            __C,
-        >>::check_bytes(unsafe { &raw const (*value).field }, context)
+        unsafe {
+            <bool as ::bytecheck::CheckBytes<
+                __C,
+            >>::check_bytes(&raw const (*value).field, context)
+        }
             .map_err(|e| {
                 <<__C as ::bytecheck::rancor::Fallible>::Error as ::bytecheck::rancor::Trace>::trace(
                     e,
@@ -49,9 +51,11 @@ where
         value: *const Self,
         context: &mut __C,
     ) -> ::core::result::Result<(), <__C as ::bytecheck::rancor::Fallible>::Error> {
-        <bool as ::bytecheck::CheckBytes<
-            __C,
-        >>::check_bytes(unsafe { &raw const (*value).0 }, context)
+        unsafe {
+            <bool as ::bytecheck::CheckBytes<
+                __C,
+            >>::check_bytes(&raw const (*value).0, context)
+        }
             .map_err(|e| {
                 <<__C as ::bytecheck::rancor::Fallible>::Error as ::bytecheck::rancor::Trace>::trace(
                     e,
@@ -123,14 +127,16 @@ const _: () = {
             value: *const Self,
             context: &mut __C,
         ) -> ::core::result::Result<(), <__C as ::bytecheck::rancor::Fallible>::Error> {
-            let tag = *value.cast::<u8>();
+            let tag = unsafe { *value.cast::<u8>() };
             match tag {
                 Discriminant::Unit => {}
                 Discriminant::Tuple => {
                     let value = value.cast::<VariantTuple>();
-                    <bool as ::bytecheck::CheckBytes<
-                        __C,
-                    >>::check_bytes(&raw const (*value).1, context)
+                    unsafe {
+                        <bool as ::bytecheck::CheckBytes<
+                            __C,
+                        >>::check_bytes(&raw const (*value).1, context)
+                    }
                         .map_err(|e| {
                             <<__C as ::bytecheck::rancor::Fallible>::Error as ::bytecheck::rancor::Trace>::trace(
                                 e,
@@ -144,9 +150,11 @@ const _: () = {
                 }
                 Discriminant::Named => {
                     let value = value.cast::<VariantNamed>();
-                    <bool as ::bytecheck::CheckBytes<
-                        __C,
-                    >>::check_bytes(unsafe { &raw const (*value).field }, context)
+                    unsafe {
+                        <bool as ::bytecheck::CheckBytes<
+                            __C,
+                        >>::check_bytes(&raw const (*value).field, context)
+                    }
                         .map_err(|e| {
                             <<__C as ::bytecheck::rancor::Fallible>::Error as ::bytecheck::rancor::Trace>::trace(
                                 e,
@@ -162,6 +170,68 @@ const _: () = {
                     return ::core::result::Result::Err(
                         <<__C as ::bytecheck::rancor::Fallible>::Error as ::bytecheck::rancor::Source>::new(::bytecheck::InvalidEnumDiscriminantError {
                             enum_name: "Choice",
+                            invalid_discriminant: tag,
+                        }),
+                    );
+                }
+            }
+            ::core::result::Result::Ok(())
+        }
+    }
+};
+#[repr(u8)]
+enum ChoiceOneVariant {
+    Boo(usize),
+}
+const _: () = {
+    #[repr(u8)]
+    enum Tag {
+        Boo,
+    }
+    struct Discriminant;
+    #[automatically_derived]
+    impl Discriminant {
+        #[allow(non_upper_case_globals)]
+        const Boo: u8 = Tag::Boo as u8;
+    }
+    #[repr(C)]
+    struct VariantBoo(Tag, usize, ::core::marker::PhantomData<ChoiceOneVariant>);
+    #[automatically_derived]
+    unsafe impl<
+        __C: ::bytecheck::rancor::Fallible + ?::core::marker::Sized,
+    > ::bytecheck::CheckBytes<__C> for ChoiceOneVariant
+    where
+        <__C as ::bytecheck::rancor::Fallible>::Error: ::bytecheck::rancor::Source,
+        usize: ::bytecheck::CheckBytes<__C>,
+    {
+        unsafe fn check_bytes(
+            value: *const Self,
+            context: &mut __C,
+        ) -> ::core::result::Result<(), <__C as ::bytecheck::rancor::Fallible>::Error> {
+            let tag = unsafe { *value.cast::<u8>() };
+            match tag {
+                Discriminant::Boo => {
+                    let value = value.cast::<VariantBoo>();
+                    unsafe {
+                        <usize as ::bytecheck::CheckBytes<
+                            __C,
+                        >>::check_bytes(&raw const (*value).1, context)
+                    }
+                        .map_err(|e| {
+                            <<__C as ::bytecheck::rancor::Fallible>::Error as ::bytecheck::rancor::Trace>::trace(
+                                e,
+                                ::bytecheck::UnnamedEnumVariantCheckContext {
+                                    enum_name: "ChoiceOneVariant",
+                                    variant_name: "Boo",
+                                    field_index: 1,
+                                },
+                            )
+                        })?;
+                }
+                _ => {
+                    return ::core::result::Result::Err(
+                        <<__C as ::bytecheck::rancor::Fallible>::Error as ::bytecheck::rancor::Source>::new(::bytecheck::InvalidEnumDiscriminantError {
+                            enum_name: "ChoiceOneVariant",
                             invalid_discriminant: tag,
                         }),
                     );
